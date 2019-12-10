@@ -180,6 +180,17 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    if (accumulator === undefined) {
+      accumulator = collection[0];
+      for (var i = 1; i < collection.length; i++) {
+        accumulator = iterator(accumulator, collection[i], i, collection);
+      }
+    } else {
+      for (var i = 0; i < collection.length; i++) {
+        accumulator = iterator(accumulator, collection[i], i, collection);
+      }
+    }
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -274,6 +285,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var memoObj = {};
+
+    return function() {
+      if(memoObj.hasOwnProperty(JSON.stringify(func.arguments))) {
+        return memoObj[JSON.stringify(func.arguments)];
+      } else {
+        memoObj[JSON.stringify(func.arguments)] = func();
+        return memoObj[JSON.stringify(func.arguments)];
+      }
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
